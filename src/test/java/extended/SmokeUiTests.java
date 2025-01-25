@@ -1,26 +1,42 @@
 package extended;
 
-import extended.controllers.UserController;
+import extended.pages.HomePage;
+import extended.pages.WebFormPage;
 import io.qameta.allure.Feature;
-import io.restassured.response.Response;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
 
-import static extended.testdata.Constants.DEFAULT_USER;
-
-@Feature("SmokeApiTests")
-@Tag("api")
+@Feature("SmokeUiTests")
+@Tag("ui")
 @Tag("smoke")
-class SmokeApiTests {
-    UserController userController = new UserController();
+class SmokeUiTests {
+    HomePage homePage;
+
+    @BeforeEach
+    void setUp() {
+        homePage = new HomePage(new ChromeDriver());
+    }
+
+    @AfterEach
+    void tearDown() {
+        homePage.quit();
+    }
 
     @Test
-    @DisplayName("Check added user is return 200 status code")
-    void createUserApiTest() {
-        Response response = userController.createUser(DEFAULT_USER);
+    @DisplayName("Check form submitted and has title")
+    void submitWebFormUiTest() {
+        WebFormPage webFormPage = homePage.openWebForm();
 
-        Assertions.assertEquals(200, response.statusCode());
+        webFormPage.fillTextInput("Text");
+        webFormPage.submitForm();
+        WebElement titleElement = webFormPage.getTitle();
+
+        Assertions.assertEquals("Form submitted", titleElement.getText());
     }
 }
